@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DllTest", "DllTest\DllTest.vcproj", "{E297B9F6-2A47-4AD0-A036-3B50A8C335A9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{4B1325F6-E399-4D64-988E-A3D39ADD2787}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MainTest_Console", "..\..\MainTest_Console\MainTest_Console.vcproj", "{24AA48BA-5EB8-4291-B935-C8BAFA495818}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E297B9F6-2A47-4AD0-A036-3B50A8C335A9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E297B9F6-2A47-4AD0-A036-3B50A8C335A9}.Debug|Win32.Build.0 = Debug|Win32
+		{E297B9F6-2A47-4AD0-A036-3B50A8C335A9}.Release|Win32.ActiveCfg = Release|Win32
+		{E297B9F6-2A47-4AD0-A036-3B50A8C335A9}.Release|Win32.Build.0 = Release|Win32
+		{24AA48BA-5EB8-4291-B935-C8BAFA495818}.Debug|Win32.ActiveCfg = Debug|Win32
+		{24AA48BA-5EB8-4291-B935-C8BAFA495818}.Debug|Win32.Build.0 = Debug|Win32
+		{24AA48BA-5EB8-4291-B935-C8BAFA495818}.Release|Win32.ActiveCfg = Release|Win32
+		{24AA48BA-5EB8-4291-B935-C8BAFA495818}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{24AA48BA-5EB8-4291-B935-C8BAFA495818} = {4B1325F6-E399-4D64-988E-A3D39ADD2787}
+	EndGlobalSection
+EndGlobal

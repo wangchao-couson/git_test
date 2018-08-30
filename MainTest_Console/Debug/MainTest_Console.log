@@ -1,0 +1,14 @@
+﻿  stdafx.cpp
+  MainTest_Console.cpp
+e:\test\maintest_console\tsi\tsitcp.h(312): warning C4996: 'wcsncpy': This function or variable may be unsafe. Consider using wcsncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(204): note: 参见“wcsncpy”的声明
+e:\test\maintest_console\tsi\tsitcp.h(317): warning C4996: 'wcsncat': This function or variable may be unsafe. Consider using wcsncat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(182): note: 参见“wcsncat”的声明
+e:\test\maintest_console\maintest_console.cpp(45): warning C4995: “PathAppendW”: 名称被标记为 #pragma deprecated
+e:\test\maintest_console\maintest_console.cpp(63): warning C4995: “PathAppendW”: 名称被标记为 #pragma deprecated
+e:\test\maintest_console\maintest_console.cpp(64): warning C4995: “PathAppendW”: 名称被标记为 #pragma deprecated
+e:\test\maintest_console\maintest_console.cpp(82): warning C4995: “PathAddBackslashW”: 名称被标记为 #pragma deprecated
+e:\test\maintest_console\maintest_console.cpp(173): warning C4102: “Exit0”: 未引用的标签
+MainTest_Console.obj : warning LNK4075: 忽略“/EDITANDCONTINUE”(由于“/SAFESEH”规范)
+  MainTest_Console.vcxproj -> E:\test\MainTest_Console\Debug\MainTest_Console.exe
+  MainTest_Console.vcxproj -> E:\test\MainTest_Console\Debug\MainTest_Console.pdb (Full PDB)

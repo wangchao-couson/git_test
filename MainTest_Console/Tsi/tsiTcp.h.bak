@@ -1,0 +1,228 @@
+#ifndef _tsi_tcp_h_
+#define _tsi_tcp_h_
+
+#include "tsPubDef.h"
+#include "tsiTcpError.h"
+
+ns_begin_tscNet;
+
+// ////////////////////////////////////////////////////////////////////////
+class ItnTcpEvent;
+
+// ////////////////////////////////////////////////////////////////////////
+// PREDEFINED DOMAIN
+#define DNF_CONN_SVR_DOMAIN     ("conn.gamesafe.qq.com")
+#define CF_CONN_SVR_DOMAIN      ("conncf.gamesafe.qq.com")
+
+typedef enum tagGameID
+{
+    GAME_ID_OTHER           = 0,
+    GAME_ID_QQFFO           = 1,
+    GAME_ID_QQFO            = 2,
+    GAME_ID_CROSSFIRE       = 3,
+    GAME_ID_GAMEAPP         = 4,
+    GAME_ID_DNF             = 5,
+    GAME_ID_UI_LAUNCH_DX    = 6,
+    GAME_ID_QY              = 7,
+    GAME_ID_QQSG            = 8,
+    GAME_ID_DP              = 9,
+    GAME_ID_AVA             = 10,
+    GAME_ID_QQPETS3D        = 11,
+    GAME_ID_CLIENT          = 12,
+    GAME_ID_GAME            = 13,
+    GAME_ID_NCLIENT         = 14,
+    GAME_ID_TTY3D           = 15,
+    GAME_ID_QQHXSJ          = 16,
+    GAME_ID_LAUNCHER        = 17,
+    GAME_ID_XYCLIENT        = 18,
+    GAME_ID_QQGAMEHALL      = 19,
+    GAME_ID_QQMINIGAME      = 20,
+    GAME_ID_C9              = 21,
+    GAME_ID_H2              = 22,
+    GAME_ID_LEAGUEOFLEGENDS = 23,
+    GAME_ID_NBA2KONLINE     = 24,
+    GAME_ID_GAME_NX         = 25,
+    GAME_ID_QQHX            = 26,
+    GAME_ID_XXZSHELL        = 27,
+    GAME_ID_TGAME           = 28,
+    GAME_ID_ASURA           = 29,
+    GAME_ID_WAROFZOMBIE     = 30,
+    GAME_ID_XCLIENT         = 31,
+    GAME_ID_DJ2             = 32,
+    // ...
+    GAME_ID_QQLOGIN         = 200,
+    GAME_ID_QQGameProtect   = 201,
+} EGameID;
+
+typedef struct tagTS_TCPINIT_PARAM
+{
+    USHORT uGameId;
+    UINT   uUin;
+    CHAR  *pszDomain;   // 此处必须指定域名
+    DWORD  dwWorldId;
+} TS_TCPINIT_PARAM;
+
+typedef struct tagTS_TCPREG_PARAM
+{
+    UINT         uServiceId;
+    ItnTcpEvent *pTcpEnvent;
+} TS_TCPREG_PARAM;
+
+typedef enum enmCsChannelSvrId
+{
+    CS_CHANNEL_SVRID_DEFAULT   = 0,    // default server
+    CS_CHANNEL_SVRID_TCJ       = 1,    // TCJ模块
+    CS_CHANNEL_SVRID_TEST      = 2,    // 测试服务器
+    CS_CHANNEL_SVRID_TSI       = 3,    // TSI服务器
+    CS_CHANNEL_SVRID_TSU       = 4,    // TSU服务器
+    CS_CHANNEL_SVRID_ANTIBOT   = 5,    // antibot使用
+    CS_CNANNEL_SVRID_SPIDER    = 6,
+    CS_CHANNEL_SVRID_END       = 1024  // end
+} ENM_CS_CHANNEL_SVR_ID;
+
+typedef enum enmSendFlags
+{
+    SEND_FLAGS_NONE     = 0x00,
+    SEND_FLAGS_ENCRYPT  = 0x01,
+    SEND_FLAGS_COMPRESS = 0x02,
+    SEND_FLAGS_SYNC     = 0x04
+} ENM_SEND_FLAGS;
+
+typedef enum enmCsChannelErrId
+{
+    CS_CHANNEL_CONNECT_ERROR                    = 404,
+    CS_CHANNEL_TICKET_VERIFY_ERROR              = 504,
+    CS_CHANNEL_TICKET_VERIFY_SUCCESS            = 604,
+    CS_CHANNEL_RECONNECT_FAIL                   = 704,
+} ENM_CS_CHANNEL_ERR_ID;
+
+// ////////////////////////////////////////////////////////////////////////
+static const unsigned int TCP_SEEION_ID_LEN = 16;
+class ItnTcpEvent
+{
+public:
+    virtual void OnRcvData(BYTE *pbyData, DWORD dwDataSize) = 0;
+    virtual void OnError(DWORD dwErrorId) = 0;
+    virtual UINT OnTcpSessionChange(unsigned char byNewSessionID[TCP_SEEION_ID_LEN])  = 0;
+};
+
+/* 使用者注意
+
+1、发送函数为异步，调用后立即返回。单次发送数据上限4MB。
+
+2、CS通道回调机制：
+
+   1) 数据回调(OnRcvData)会放到一个队列，通道将单开一个线程，依次回调队列中的函数。
+      因此，如果某个回调阻塞住，将会影响到后续数据回调。建议只要不阻塞此函数即可。
+
+   2) 错误回调(OnError)放在窗口线程中进行，所以，请不要在OnError中不要处理大量事务。
+      否则会影响整个通道的的工作效率。
+
+3、压缩选项尚未实现。
+*/
+
+typedef struct SCsChannelStatus
+{
+    UINT   uSendSuccPkgCount;                              /*   发送pkg成功的个数，非分片 */
+    UINT   uSendFailPkgCount;                              /*   发送pkg失败的个数，非分片*/
+    UINT   uRecvSuccPkgCount;                              /*   接收pkg成功的个数, 非分片 */
+    UINT   uRecvFailPkgCount;                              /*   接收pkg失败的个数, 非分片 */
+    UINT   uLastRecvPkgSeq;                                /*   最后一次接收包的pkg seq*/
+    UINT   uLastSendPkgSeq;                                /*   最后一次发送包的pkg seq*/
+    UINT   uConnectFailCount;                              /*   连接失败次数 */
+    UINT   uGetSessionFailCount;                           /*   请求getsession失败的次数 */
+    UINT   uSenderQueueSize;                               /*   发送队列的长度*/
+    UINT   uSenderMapSize;                                 /*   发送map的长度*/
+    UINT   uRecverMapSize;                                 /*   接收map的长度*/
+    UINT   uCallbackQueueSize;                             /*   Callback队列长度*/
+    UINT   uClientIPAddress;                               /*   客户端IP地址*/
+    UINT   uServiceIPAddress;                              /*   服务器端IP地址*/
+    UINT   uMainCtrlCount;                                 /*   MainCtrl运行次数*/
+    UINT   uCallbackCount;                                 /*   CallBack运行次数*/
+    UINT   uMainCtrlThreadId;                              /*   线程MainCtrlId*/
+    UINT   uCallBackThreadId;                              /*   线程CallBackId*/
+    BOOL   bIsConnectOK;                                   /*   连接是否已经建立*/
+} CS_CHANNEL_STATUS, *PCS_CHANNEL_STATUS;
+
+
+// ////////////////////////////////////////////////////////////////////////
+class ItnTcp
+{
+public:
+    ~ItnTcp() {}
+    virtual UINT Init(TS_TCPINIT_PARAM *pInitParam) = 0;
+    virtual UINT Register(TS_TCPREG_PARAM *pRegParam) = 0;
+    virtual UINT SendData(DWORD dwServiceId, BYTE *pbyData, DWORD dwDataSize, int nSendFlags = SEND_FLAGS_NONE) = 0;
+    virtual UINT SetHeartBeat(BOOL bSet) = 0;
+    virtual UINT Release() = 0;
+    virtual void SetQosWork(bool bUseQos) = 0;
+    virtual void SetHttpWork(bool bUseHttp) = 0;
+    virtual void SetQosReportWork(bool bUseQosReport) = 0;// 加入tqos上报开关
+    virtual void GetCsChannelstatus(CS_CHANNEL_STATUS &stCsChannelStatus) = 0;
+    virtual UINT SendTicketBuff(BYTE *pbyData, DWORD dwDataSize) = 0;
+};
+
+ItnTcp *CreateTnTcp();
+
+int ReportTransStatistic();
+
+ns_end;
+
+// tersafe DllEntry6 导出函数接口
+void *WINAPI CreateCsChannelObj();
+
+#ifdef USE_TERSAFE_DLL
+
+// 如果编译成dll，使用tersafe.dll
+#define CS_CHANNEL_DLL_NAME             TEXT("tersafe.dll")
+#define CS_CHANNEL_EXPORT_FUNCTION      "DllEntry"
+
+// Dll 导出函数使用方式
+typedef tscNet::ItnTcp *(WINAPI *PFNCreateCsChannel)();
+
+inline tscNet::ItnTcp *CreateCsChannel(const TCHAR *pszSafeDllPath = NULL)
+{
+    HMODULE hModule = ::GetModuleHandle(CS_CHANNEL_DLL_NAME);
+
+    if (hModule == NULL)
+    {
+        TCHAR szPath[MAX_PATH] = {0};
+
+        if (pszSafeDllPath == NULL)
+        {
+            ::GetModuleFileName(NULL, szPath, MAX_PATH);
+            TCHAR *pszLastBackSlash = _tcsrchr(szPath, _T('\\'));
+
+            if (pszLastBackSlash != NULL)
+            {
+                *(pszLastBackSlash + 1) = 0;
+            }
+        }
+        else
+        {
+            _tcsncpy(szPath, pszSafeDllPath, sizeof(szPath) / sizeof(szPath[0]) - 1);
+        }
+
+        unsigned int cRemaining = sizeof(szPath) / sizeof(szPath[0]) - _tcslen(szPath) - 1;
+        _tcsncat(szPath, CS_CHANNEL_DLL_NAME, cRemaining);
+        hModule = ::LoadLibrary(szPath);
+
+        if (hModule == NULL)
+        {
+            return NULL;
+        }
+    }
+
+    PFNCreateCsChannel pCreateCsChannel = (PFNCreateCsChannel)::GetProcAddress(hModule, CS_CHANNEL_EXPORT_FUNCTION);
+
+    if (pCreateCsChannel == NULL)
+    {
+        return NULL;
+    }
+
+    return (tscNet::ItnTcp *)pCreateCsChannel();
+}
+
+#endif
+
+#endif // _tsi_tcp_h_
